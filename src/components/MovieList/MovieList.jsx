@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react'
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { Spin, Alert } from 'antd'
 import Movie from '../Movie/Movie'
 import './MovieList.css'
 
@@ -34,10 +36,11 @@ export default function MovieList() {
   }, [])
 
   if (error) {
-    return <div>Error: {error.message}</div>
+    return <Alert type="error" message={error.message} />
     // eslint-disable-next-line no-else-return
   } else if (!isLoad) {
-    return <div>Loading...</div>
+    // eslint-disable-next-line react/jsx-boolean-value
+    return <Spin size="large" tip="Loading..." className="spin" />
   } else {
     return <Movie movieList={movieList} />
   }
