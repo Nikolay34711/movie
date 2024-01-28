@@ -1,47 +1,36 @@
-import React, { useState, useEffect } from 'react'
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { Spin, Alert } from 'antd'
-import Movie from '../Movie/Movie'
-import './MovieList.css'
+import React from 'react'
+import PropTypes from 'prop-types'
+import MovieItem from '../Movie/Movie'
+import './MovieList.scss'
 
-export default function MovieList() {
-  const [error, setError] = useState(null)
-  const [isLoad, setIsLoad] = useState(false)
-  const [movieList, setMovieList] = useState([])
+export default function MovieList({ moviesData, onRate }) {
+  const elem = moviesData.map((item) => (
+    <MovieItem
+      key={item.id}
+      img={item.poster_path}
+      title={item.title}
+      overview={item.overview}
+      date={item.release_date}
+      genreId={item.genre_ids}
+      vote={item.vote_average}
+      idForRate={item.id}
+      onRate={onRate}
+    />
+  ))
+  return <ul className="all-content">{elem}</ul>
+}
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await fetch(
-          'https://api.themoviedb.org/3/search/movie?query=avengers&include_adult=false&language=en-US&page=1',
-          {
-            method: 'GET',
-            headers: {
-              accept: 'application/json',
-              Authorization:
-                'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiMGMwMjE3Mjk3OWMzYmU0ZWUwMWNkYWEwODI1ZjgxZSIsInN1YiI6IjY1YjM1YTIwYTA2NjQ1MDEyZjhkNDg0ZSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.spiF3fMG198wcAtX0TcY8zXvocO5VIXY_6E46Fvxl_g',
-            },
-          },
-        )
-        const data = await res.json()
-        setIsLoad(true)
-        setMovieList(data.results)
-        // eslint-disable-next-line no-shadow
-      } catch (error) {
-        setError(error)
-      }
-    }
-
-    fetchData()
-  }, [])
-
-  if (error) {
-    return <Alert type="error" message={error.message} />
-    // eslint-disable-next-line no-else-return
-  } else if (!isLoad) {
-    // eslint-disable-next-line react/jsx-boolean-value
-    return <Spin size="large" tip="Loading..." className="spin" />
-  } else {
-    return <Movie movieList={movieList} />
-  }
+MovieList.propTypes = {
+  moviesData: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      poster_path: PropTypes.string,
+      title: PropTypes.string.isRequired,
+      overview: PropTypes.string.isRequired,
+      release_date: PropTypes.string.isRequired,
+      genre_ids: PropTypes.arrayOf(PropTypes.number),
+      vote_average: PropTypes.number.isRequired,
+    }),
+  ).isRequired,
+  onRate: PropTypes.func.isRequired,
 }
